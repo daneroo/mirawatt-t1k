@@ -23,6 +23,9 @@ I need to write a `udev` rule to assign a known name to the device.
     root@cantor:~# lsusb|grep -i serial
     Bus 003 Device 002: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
     Bus 002 Device 002: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
+	find /sys -name dev|grep -i ttyusb
+	/sys/devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1:1.0/ttyUSB1/tty/ttyUSB1/dev
+	/sys/devices/pci0000:00/0000:00:1d.1/usb3/3-2/3-2:1.0/ttyUSB0/tty/ttyUSB0/dev	
     
 The FTDI device is TED's. (the other PL2303 is the current cost device).
 
