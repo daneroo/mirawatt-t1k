@@ -29,7 +29,17 @@ I need to write a `udev` rule to assign a known name to the device.
     
 The FTDI device is TED's. (the other PL2303 is the current cost device).
 
+root@cantor:/etc/udev/rules.d# udevadm info -a -p $(udevadm info -q path -n TED1K) | egrep -i "ATTRS{serial}|ATTRS{idVendor}|ATTRS{idProduct}" -m 3
+    ATTRS{idVendor}=="0403"
+    ATTRS{idProduct}=="6001"
+    ATTRS{serial}=="A7004VwU"
+
 So looks like all I need to make `/dev/ttyTED1k`,`/dev/ttyCRNTCOST` is a rule like
+
+
+    # cat 10-ftdi-ted1k.rules 
+    BUS=="usb", SYSFS{idVendor}=="0403", SYSFS{idProduct}=="6001", NAME="TED1K"
+
     
     kernel=="ttyUSB*", SYSFS{idVendor}=="0403", SYSFS{idProduct}=="6001", SYMLINK="TED1K"
     
@@ -39,6 +49,7 @@ So looks like all I need to make `/dev/ttyTED1k`,`/dev/ttyCRNTCOST` is a rule li
 
 ### References
 
+*   [Rule example for FTDI](http://aeturnalus.com/robotics/mapping-ftdi-to-files-with-udev/)
 *   [Udev rule writing](http://www.reactivated.net/writing_udev_rules.html#ownership)
 *   [Thread that brought me there](http://fixunix.com/ubuntu/494414-serial-ports-ttyusb%7B0-9%7D.html)
 
