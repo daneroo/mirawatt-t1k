@@ -1,48 +1,28 @@
-The instruction in /mirawatt/HOWTO.. 
-  are not yet FULLY implemented.
-
-The Currentcost part is ok...
-For TED1000 use this...
-
-
--=-=-= Simple startup for capture : CurrentCost
-  The checked out sources are in: 
-    /home/daniel/green/scalr-utils/mirawatt
-  But the data output is hardcoded in the script to point to:
-   /home/daniel/netbeans-workspace/green/scalr-utils/mirawatt
-
-  su - # become root
-  cd /home/daniel/green/scalr-utils/mirawatt/wdog
-  ## device may have changed..
-  ./captureCC.sh /dev/ttyUSB2 57600 CC1
-  ## MOnitor output
-  cd /home/daniel/netbeans-workspace/green/scalr-utils/mirawatt
-  tail -f CC1-200*.log
-
 -=-=-= Simple Startup for TED1000 Capture
-  SCREEN 6 on cantor
-   #OLD cd netbeans-workspace/green/scalr-utils/
-   cd /home/daniel/Documents/NetBeansProjects/green/scalr-utils/
+#     PUT each of these in a new tab (ctrl-shit-T, ctrl-PgDn to swap)
 
-  A-ReadTEDNative  #alternative --duration 86400 instead of --forever for periodic log statement
-    # in a screen as root:
+# A-capture
+#  This runs (or reattaches a screen as daniel, then cd .. and run script , as sudo'd root
 
-    while true; do echo `date` Restarted ReadTEDNative | tee -a TEDNative.log; python ReadTEDNative.py --forever --device /dev/ttyUSB0; sleep 1; done
+screen -q -R
+echo "cd /home/daniel/Documents/NetBeansProjects/green/scalr-utils/; pwd; whoami; while true; do echo \`date\` Restarted ReadTEDNative | tee -a TEDNative.log; python ReadTEDNative.py --forever --device /dev/TED1K; sleep 3;[ -e /dev/TED1K ] || sleep 30; done"| sudo sh
 
-  B-Summarize.py until there is a cron
-    #   The while is for unexpected death.- New switches --days 1, --forever
 
-    while true; do time python Summarize.py --days 1 --forever; sleep 10; done
+# B-Summarize.py until there is a cron
+#   The while is for unexpected death.- New switches --days 1, --forever
 
-  C-Push to imetrical.appspot.com (timeout 30s)
-      # OR to http://imetrical.morphexchange.com/post.jsp
-    while true; do curl -m 30 -s -o tmp.xml http://192.168.5.2/iMetrical/feeds.php; curl -m 30 -F "owner=daniel" -F "content=@tmp.xml;type=text/xml"  http://imetrical.appspot.com/post; sleep 1; done
+cd /home/daniel/Documents/NetBeansProjects/green/scalr-utils; while true; do time python Summarize.py --days 1 --forever; sleep 10; done
 
-  D-Monitoring
-    # watch live and summary tables
+# C-Push to imetrical.appspot.com (timeout 30s)
 
-    while true; do for i in 'watt_day ' 'watt_hour' 'watt_minute' 'watt_tensec' 'watt' 'ted_service' ; do echo `mysql ted -N -B -e "select now(),'--',stamp,watt from $i order by stamp desc limit 1"` $i; done; sleep 9; echo; done
+while true; do curl -m 30 -s -o tmp.xml http://192.168.5.2/iMetrical/feeds.php; curl -m 30 -F "owner=daniel" -F "content=@tmp.xml;type=text/xml"  http://imetrical.appspot.com/post; sleep 1; done
 
-    #Log output of TedNative Restarts
+# D-Monitoring
+# watch live and summary tables
 
-    tail -f netbeans-workspace/green/scalr-utils/TEDNative.log
+while true; do for i in 'watt_day ' 'watt_hour' 'watt_minute' 'watt_tensec' 'watt' 'ted_service' ; do echo `mysql ted -N -B -e "select now(),'--',stamp,watt from $i order by stamp desc limit 1"` $i; done; sleep 9; echo; done
+
+# E-Log output of TedNative Restarts (Optional)
+
+tail -f /home/daniel/Documents/NetBeansProjects/green/scalr-utils/TEDNative.log
+
